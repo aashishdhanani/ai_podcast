@@ -2,7 +2,7 @@ from docling.document_converter import DocumentConverter
 
 # source = "https://arxiv.org/pdf/1706.03762"
 
-class DocumentConverter():
+class DocumentProcessor():
     def __init__(self):
         """
         Initialize the DocumentConverter with a DocumentConverter object.

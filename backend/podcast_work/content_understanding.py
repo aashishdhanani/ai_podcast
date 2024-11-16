@@ -2,14 +2,10 @@ from dotenv import load_dotenv
 import os
 load_dotenv()
 import anthropic
+from content_processing import DocumentProcessor
+import time
 
-'''Step 1: Call content_processing to get markdown of paper'''
-from content_processing import DocumentConverter
-converter = DocumentConverter()
-result = converter.convertpdf("https://arxiv.org/pdf/1706.03762") #markdown of paper
-
-
-'''Step 2: Four agents tasked with understanding the paper and making sure the podcast script is robust to feed into 11labs'''
+'''Step 1: Four agents tasked with understanding the paper and making sure the podcast script is robust to feed into 11labs'''
 claude_key = os.getenv("ANTHROPIC_API_KEY")
 client = anthropic.Anthropic(api_key=claude_key)
 
@@ -47,7 +43,7 @@ def research_agent(markdown):
             }
         ]
     )
-    return message.content
+    return message.content[0].text
     
 
 """
@@ -92,7 +88,7 @@ def planning_agent(research_analysis):
             }
         ]
     )
-    return message.content
+    return message.content[0].text
 
 
 """
@@ -157,7 +153,7 @@ def writing_agent(plan):
             }
         ]
     )
-    return message.content
+    return message.content[0].text
 
 
 """
@@ -181,7 +177,7 @@ def editor_agent(script):
             3. Appropriate pacing and timing
             4. Technical accuracy with engagement
 
-            Provide specific edits and improvements."""
+            Make specific edits and improvements and give the final script for the podcast."""
     message = client.messages.create(
         model="claude-3-5-sonnet-20241022",
         max_tokens=1000,
@@ -199,11 +195,38 @@ def editor_agent(script):
             }
         ]
     )
-    return message.content
+    return message.content[0].text
 
 
-'''Step 3: Call the functions and store the final script in final_script variable'''
+'''Step 2: Call the functions and store the final script in final_script variable'''
+print("Starting pipeline...\n")
+print("1. Processing paper with docling...")
+converter = DocumentProcessor()
+result = converter.convertpdf("https://arxiv.org/pdf/1706.03762")
+print(type(result))
+print("✓ Paper processed")
+
+print("\n2. Running research analysis...")
+start = time.time()
 research = research_agent(result)
+print(f"✓ Research complete ({time.time() - start:.2f}s)")
+
+print("\n3. Creating podcast plan...")
+start = time.time()
 plan = planning_agent(research)
+print(f"✓ Plan complete ({time.time() - start:.2f}s)")
+
+print("\n4. Writing initial script...")
+start = time.time()
 initial_script = writing_agent(plan)
+print(f"✓ Script written ({time.time() - start:.2f}s)")
+
+print("\n5. Editing final script...")
+start = time.time()
 final_script = editor_agent(initial_script)
+print(f"✓ Script edited ({time.time() - start:.2f}s)")
+
+print("\nPipeline complete!\n\n")
+
+print("Here is the podcast script: \n\n")
+print(final_script)
