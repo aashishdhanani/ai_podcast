@@ -92,20 +92,20 @@ def planning_agent(research_analysis):
 
 
 """
-Generates a 30-minute podcast outline based on the provided research analysis.
+Converts a podcast outline into a natural conversation between two hosts.
 
 Parameters
 ----------
 plan : str
-    A detailed analysis of a technical paper including its core innovation,
+    A detailed outline of a technical paper including its core innovation,
     key technical components, major implications, and historical context.
 
 Returns
 -------
 str
-    The podcast outline structured with timing and key points, designed to
-    engage a technical audience by breaking down complex concepts and providing
-    impactful takeaways.
+    The podcast script structured with natural dialogue between two hosts,
+    designed to engage a technical audience by breaking down complex concepts
+    and providing impactful takeaways.
 """
 def writing_agent(plan):
     prompt = """You are a podcast scriptwriter specializing in technical discussions.
