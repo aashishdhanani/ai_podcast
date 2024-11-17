@@ -164,7 +164,7 @@ def writing_agent(plan):
     - Maintain a balance between informative content and engaging dialogue
     - End the podcast with a statement or question that encourages further thought or discussion on the topic
 
-    Remember to generate a script that sounds natural and engaging when read aloud, as if it were a real-time conversation between two knowledgeable hosts. The output should only be the script, no additional comments or meta-commentary"""
+    Remember to generate a script that sounds natural and engaging when read aloud, as if it were a real-time conversation between two knowledgeable hosts. The output should only be the fully completed script, no additional comments or meta-commentary. Note that the script should also have Host 1 and Host 2 in their respectful text portions."""
     message = client.messages.create(
         model="claude-3-5-sonnet-20241022",
         max_tokens=8192,
@@ -185,30 +185,29 @@ def writing_agent(plan):
     return message.content[0].text
 
 
+def create_script():
+    print("Starting pipeline...\n")
+    print("1. Processing paper with docling...")
+    converter = DocumentProcessor()
+    result = converter.convertpdf("https://arxiv.org/pdf/1706.03762")
+    print(type(result))
+    print("✓ Paper processed")
 
-'''Step 2: Call the functions and store the script in script variable'''
-print("Starting pipeline...\n")
-print("1. Processing paper with docling...")
-converter = DocumentProcessor()
-result = converter.convertpdf("https://arxiv.org/pdf/1706.03762")
-print(type(result))
-print("✓ Paper processed")
+    print("\n2. Running research analysis...")
+    start = time.time()
+    research = research_agent(result)
+    print(f"✓ Research complete ({time.time() - start:.2f}s)")
 
-print("\n2. Running research analysis...")
-start = time.time()
-research = research_agent(result)
-print(f"✓ Research complete ({time.time() - start:.2f}s)")
+    print("\n3. Creating podcast plan...")
+    start = time.time()
+    plan = planning_agent(research)
+    print(f"✓ Plan complete ({time.time() - start:.2f}s)")
 
-print("\n3. Creating podcast plan...")
-start = time.time()
-plan = planning_agent(research)
-print(f"✓ Plan complete ({time.time() - start:.2f}s)")
+    print("\n4. Writing script...")
+    start = time.time()
+    script = writing_agent(plan)
+    print(f"✓ Script written ({time.time() - start:.2f}s)")
 
-print("\n4. Writing script...")
-start = time.time()
-script = writing_agent(plan)
-print(f"✓ Script written ({time.time() - start:.2f}s)")
+    print("\nPipeline complete!\n\n")
 
-print("\nPipeline complete!\n\n")
-
-print(script)
+    return script
