@@ -108,37 +108,66 @@ str
     and providing impactful takeaways.
 """
 def writing_agent(plan):
-    prompt = """You are a podcast scriptwriter specializing in technical discussions.
-                Convert this outline into a natural conversation between two hosts:
+    prompt = """Generate a podcast-style audio overview script based on the provided content. The output should be a conversational script between two AI hosts discussing the main points, insights, and implications of the input material.
 
-                HOST 1: The main guide who:
-                - Introduces topics and concepts
-                - Asks insightful questions
-                - Helps listeners follow the flow
-                - Provides real-world context
-                
-                HOST 2: The technical expert who:
-                - Explains technical concepts clearly
-                - Provides detailed breakdowns
-                - Shares technical insights
-                - Connects concepts together
+    Podcast Format:
+    - No podcast name
+    - Duration: Aim for a 15-minute discussion
+    - Style: Informative yet casual, resembling a professional podcast
+    - Target Listener: A busy professional interested in efficient information consumption and staying updated on the latest developments in the field
 
-                Guidelines:
-                - Create natural back-and-forth dialogue
-                - Use conversational language while maintaining technical accuracy 
-                - Include analogies and examples to explain complex concepts
-                - Add brief pauses, emphasis points, and tone guidance [in brackets]
-                - Keep each speaking turn concise (2-3 sentences max)
-                - Include reactions and follow-up questions to maintain engagement
+    Host Personas:
+    - Host 1: The "Explainer" - Knowledgeable, articulate, and adept at breaking down complex concepts
+    - Host 2: The "Questioner" - Curious, insightful, and skilled at asking thought-provoking questions
+    - no names, just referred as host 1 and host 2
+    - Relationship: Collegial and respectful, with a hint of friendly banter
 
-                Format the script as:
-                HOST 1: [tone/direction] Dialogue text
-                HOST 2: [tone/direction] Dialogue text
-                
-                Start with an engaging introduction that hooks the audience."""
+    Podcast Structure:
+    1. Introduction (1 minute):
+    - Introduce the topic
+    - Provide a hook to capture the listener's interest
+
+    2. Overview (2 minutes):
+    - Summarize the key points from the input content
+    - Set the stage for the detailed discussion
+
+    3. Main Discussion (8-10 minutes):
+    - Analyze and discuss the most important aspects of the topic
+    - Present different perspectives and potential implications
+    - Use specific examples and details from the input content to illustrate points
+
+    4. Conclusion (1 minute):
+    - Recap the main takeaways
+    - Provide a thought-provoking final comment or question
+
+    Content Analysis and Discussion:
+    - Identify the core concepts, key arguments, and significant details from the input material
+    - Organize the discussion around these main points, ensuring a logical flow of ideas
+    - Encourage a balanced exploration of the topic, considering various viewpoints when appropriate
+
+    Tone and Style:
+    - Maintain a conversational, engaging tone throughout the discussion
+    - Use clear, accessible language while accurately conveying complex ideas
+    - Incorporate natural speech patterns, including occasional "disfluencies" (e.g., "um," "uh," brief pauses) and conversational fillers (e.g., "you know," "I mean")
+    - Add moments of light banter or personal observations to enhance the natural feel of the conversation
+
+    Script Refinement Process:
+    1. Generate an initial outline of the discussion
+    2. Develop a detailed script based on the outline
+    3. Review the script for clarity, coherence, and engagement
+    4. Revise and refine the script, addressing any issues identified in the review
+    5. Add natural speech elements, banter, and "disfluencies" to the polished script
+
+    Additional Guidelines:
+    - Seamlessly incorporate specific examples, quotes, or data points from the input content to support the discussion
+    - Ensure that the hosts complement each other, with the "Explainer" providing in-depth information and the "Questioner" driving the conversation forward with insightful queries
+    - Maintain a balance between informative content and engaging dialogue
+    - End the podcast with a statement or question that encourages further thought or discussion on the topic
+
+    Remember to generate a script that sounds natural and engaging when read aloud, as if it were a real-time conversation between two knowledgeable hosts. The output should only be the script, no additional comments or meta-commentary"""
     message = client.messages.create(
         model="claude-3-5-sonnet-20241022",
-        max_tokens=1000,
+        max_tokens=8192,
         temperature=0,
         system=prompt,
         messages=[
@@ -156,49 +185,8 @@ def writing_agent(plan):
     return message.content[0].text
 
 
-"""
-Review a podcast script and provide specific edits and improvements.
 
-Parameters
-----------
-script : str
-    The podcast script to be reviewed.
-
-Returns
--------
-str
-    A string containing specific edits and improvements to the script.
-"""
-def editor_agent(script):
-    prompt = """You are a podcast script editor.
-            Review this script for:
-            1. Consistent voice/tone throughout
-            2. Natural transitions between sections
-            3. Appropriate pacing and timing
-            4. Technical accuracy with engagement
-
-            Make specific edits and improvements and give the final script for the podcast."""
-    message = client.messages.create(
-        model="claude-3-5-sonnet-20241022",
-        max_tokens=1000,
-        temperature=0,
-        system=prompt,
-        messages=[
-            {
-                "role": "user",
-                "content" : [
-                    {
-                        "type": "text",
-                        "text" : script
-                    }
-                ]
-            }
-        ]
-    )
-    return message.content[0].text
-
-
-'''Step 2: Call the functions and store the final script in final_script variable'''
+'''Step 2: Call the functions and store the script in script variable'''
 print("Starting pipeline...\n")
 print("1. Processing paper with docling...")
 converter = DocumentProcessor()
@@ -216,17 +204,11 @@ start = time.time()
 plan = planning_agent(research)
 print(f"✓ Plan complete ({time.time() - start:.2f}s)")
 
-print("\n4. Writing initial script...")
+print("\n4. Writing script...")
 start = time.time()
-initial_script = writing_agent(plan)
+script = writing_agent(plan)
 print(f"✓ Script written ({time.time() - start:.2f}s)")
-
-print("\n5. Editing final script...")
-start = time.time()
-final_script = editor_agent(initial_script)
-print(f"✓ Script edited ({time.time() - start:.2f}s)")
 
 print("\nPipeline complete!\n\n")
 
-print("Here is the podcast script: \n\n")
-print(final_script)
+print(script)
