@@ -1,10 +1,3 @@
-'''
-script: split up between Host 1 and Host2
-
-we need to make audio that combines 11labs audio for host 1 and 11labs audio for host 2 for final podcast
-
-'''
-
 from dotenv import load_dotenv
 import os
 load_dotenv()

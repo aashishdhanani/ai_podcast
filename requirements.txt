@@ -1,0 +1,5 @@
+docling
+anthropic
+python-dotenv
+requests
+pydub

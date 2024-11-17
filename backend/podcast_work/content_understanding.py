@@ -184,6 +184,21 @@ def writing_agent(plan):
     )
     return message.content[0].text
 
+
+
+"""
+Expand an existing podcast script by adding more detailed technical explanations, real-world examples, and expansions on implications and applications while maintaining the same conversational style and host dynamics.
+
+Parameters
+----------
+script : str
+    The existing script to be expanded.
+
+Returns
+-------
+str
+    The expanded script with more detailed technical explanations, real-world examples, and expansions on implications and applications.
+"""
 def expand_agent(script):
     prompt = """You are expanding an existing podcast script. Take the provided script and:
     1. Add more detailed technical explanations
