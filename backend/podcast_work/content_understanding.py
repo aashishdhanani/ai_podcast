@@ -164,7 +164,7 @@ def writing_agent(plan):
     - Maintain a balance between informative content and engaging dialogue
     - End the podcast with a statement or question that encourages further thought or discussion on the topic
 
-    Remember to generate a script that sounds natural and engaging when read aloud, as if it were a real-time conversation between two knowledgeable hosts. The output should only be the fully completed script, no additional comments or meta-commentary. Note that the script should also have Host 1 and Host 2 in their respectful text portions."""
+    Remember to generate a script that sounds natural and engaging when read aloud, as if it were a real-time conversation between two knowledgeable hosts. The output should only be the fully completed script using the max 8192 tokens, no additional comments or meta-commentary. Note that the script should also have Host 1 and Host 2 in their respectful text portions."""
     message = client.messages.create(
         model="claude-3-5-sonnet-20241022",
         max_tokens=8192,
@@ -184,11 +184,42 @@ def writing_agent(plan):
     )
     return message.content[0].text
 
+def expand_agent(script):
+    prompt = """You are expanding an existing podcast script. Take the provided script and:
+    1. Add more detailed technical explanations
+    2. Include more real-world examples
+    3. Expand on implications and applications
+    4. Keep the same conversational style and host dynamics
+    5. Maintain the natural flow
+
+    DO NOT change the existing content, only expand upon it.
+    Format must remain exactly the same (Host 1: ... Host 2: ...). Again, everything must remain the same but just add more content according to the 5 rules above. Use all max tokens of 8192 to do so."""
+    message = client.messages.create(
+    model="claude-3-5-sonnet-20241022",
+    max_tokens=8192,
+    temperature=0,
+    system=prompt,
+    messages=
+        [
+            {
+                "role": "user",
+                "content" : [
+                    {
+                        "type": "text",
+                        "text" : script
+                    }
+                ]
+            }
+        ]
+    )
+    return message.content[0].text
+
 
 def create_script():
     print("Starting pipeline...\n")
     print("1. Processing paper with docling...")
     converter = DocumentProcessor()
+    #can use your own link for your pdf here!!!
     result = converter.convertpdf("https://arxiv.org/pdf/1706.03762")
     print(type(result))
     print("✓ Paper processed")
@@ -208,6 +239,12 @@ def create_script():
     script = writing_agent(plan)
     print(f"✓ Script written ({time.time() - start:.2f}s)")
 
+    print("\n4. Expanding script...")
+    start = time.time()
+    first_expansion = expand_agent(script)
+    second_expansion = expand_agent(first_expansion)
+    print(f"✓ Script expanded ({time.time() - start:.2f}s)")
     print("\nPipeline complete!\n\n")
+    finalscript = second_expansion
 
-    return script
+    return finalscript

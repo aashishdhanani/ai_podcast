@@ -16,7 +16,7 @@ from pydub import AudioSegment
 
 class PodcastGenerator:
     def __init__(self):
-        self.host1_id = "nPczCjzI2devNBz1zQrb"
+        self.host1_id = "XrExE9yKIg1WjnnlVkGX"
         self.host2_id = "nPczCjzI2devNBz1zQrb"
         self.api_key = os.getenv("ELEVEN_LABS_API_KEY")
         self.chunk_size = 1024
@@ -105,6 +105,7 @@ def create_podcast(script: str):
     segments = generator.split_script(script)
     print(f"Generated {len(segments)} segments")
     print(segments[0])
+    print(segments[-1])
     
     print("Generating audio...")
     final_path = generator.generate_audio(segments)
